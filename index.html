@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Chat Application</title>
+    <style>
+        /* CSS Reset & Variables */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-color: #f0f2f5;
+            --chat-bg: #efeae2;
+            --primary-color: #0084ff;
+            --sent-msg: #d9fdd3;
+            --rcvd-msg: #ffffff;
+            --text-dark: #111b21;
+            --text-muted: #667781;
+            --border-color: #e9edef;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Chat Container Layout */
+        .chat-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 768px) {
+            .chat-container {
+                height: 80vh;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+        }
+
+        /* Header Styling */
+        .chat-header {
+            background-color: #f0f2f5;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .user-info h2 {
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        .user-info p {
+            font-size: 0.75rem;
+            color: #25d366;
+            font-weight: 500;
+        }
+
+        /* Message Area Styling */
+        .chat-messages {
+            flex: 1;
+            background-color: var(--chat-bg);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background-color: var(--sent-msg);
+            color: var(--text-dark);
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+
+        .message.received {
+            background-color: var(--rcvd-msg);
+            color: var(--text-dark);
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Input Bar Styling */
+        .chat-input-area {
+            background-color: #f0f2f5;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.95rem;
+            background-color: #ffffff;
+        }
+
+        .send-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .send-btn:hover {
+            background-color: #0066cc;
+        }
+
+        .send-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            transform: rotate(45deg);
+            margin-left: -2px;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <!-- Header Section -->
+        <header class="chat-header">
+            <div class="avatar">JD</div>
+            <div class="user-info">
+                <h2>John Doe</h2>
+                <p>Online</p>
+            </div>
+        </header>
+
+        <!-- Messages Main Stream -->
+        <main class="chat-messages" id="chatMessages">
+            <div class="message received">
+                Hello! Welcome to the chat interface.
+                <span class="message-time">10:00 AM</span>
+            </div>
+            <div class="message sent">
+                Hi! This markup template looks very clean.
+                <span class="message-time">10:01 AM</span>
+            </div>
+        </main>
+
+        <!-- Footer Input Form -->
+        <form class="chat-input-area" id="chatForm">
+            <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" required />
+            <button type="submit" class="send-btn" aria-label="Send message">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- Interface Functionality Execution -->
+    <script>
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+        const chatMessages = document.getElementById('chatMessages');
+
+        // Automatically auto-scroll viewport window to bottom
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Generate dynamic local device time string
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Append generated markup element inside container block
+        function appendMessage(text, senderType) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', senderType);
+
+            messageDiv.innerHTML = `
+                ${text}
+                <span class="message-time">${getCurrentTime()}</span>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Handle text validation submission event rules
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const messageText = messageInput.value.trim();
+            
+            if (messageText === '') return;
+
+            // 1. Output Sent Message from Input Element
+            appendMessage(messageText, 'sent');
+            messageInput.value = '';
+
+            // 2. Optional: Mock Automated Response Behavior 
+            setTimeout(() => {
+                appendMessage("Thanks for your message! This is an automated echo.", 'received');
+            }, 1000);
+        });
+
+        // Initialize scroll position on load
+        scrollToBottom();
+    </script>
+</body>
+</html>
